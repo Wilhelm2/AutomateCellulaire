@@ -1,15 +1,11 @@
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.JLabel ;
+import javax.swing.JLabel;
 import javax.swing.ImageIcon ;
 import java.io.IOException ;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.util.ArrayList ;
 import java.awt.Dimension ;
 import java.awt.Toolkit;
-import java.util.concurrent.TimeUnit;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -18,6 +14,8 @@ import javax.swing.JButton ;
 import java.awt.BorderLayout;
 import java.lang.Thread ;
 import java.awt.event.*;
+import javax.swing.JFormattedTextField ;
+import java.awt.Font;
 
 
 
@@ -34,11 +32,11 @@ public class Affichage2 extends JPanel
         throws IOException, InterruptedException 
     {
         final JFrame frame= new JFrame();
-        
         final Automate Aut = new Automate ( Integer.parseInt(args[0]), Integer.parseInt(args[1]), 10);
         Aut.DefaultSetting();
         Historique History = new Historique();
         boolean changing = true;
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
         JToolBar toolbar = new JToolBar();
         
@@ -88,6 +86,30 @@ public class Affichage2 extends JPanel
         });
         toolbar.add(button);
         
+        
+        // SPEED
+        JLabel L = new JLabel(" Speed :");
+        L.setFont(new Font("Courier", Font.BOLD,15));
+        toolbar.add( L);
+        final JFormattedTextField F = new JFormattedTextField ();
+        F.setPreferredSize( new Dimension(40, 30) );
+        F.setMaximumSize( new Dimension(30, 30) );
+        toolbar.add(F);
+        
+        button = new JButton( "OK");
+        button.addActionListener(new ActionListener(){
+            public void actionPerformed( ActionEvent ae )
+            {
+                int speed;
+                try
+                {speed = Integer.parseInt(F.getText(),10);}
+                catch ( NumberFormatException e) { System.out.println("Mauvais format"); return;};
+                Aut.speed = speed;
+            }
+        });
+        toolbar.add(button);
+        
+        
         frame.add(toolbar, BorderLayout.NORTH);
 
         A = new Affichage2(Integer.parseInt(args[0]), Integer.parseInt(args[1]), Aut);
@@ -100,14 +122,15 @@ public class Affichage2 extends JPanel
 
         while(changing)
         {
-            try { TimeUnit.SECONDS.sleep(1); } 
+            try { Thread.sleep(1000/ Aut.speed); } 
                 catch (InterruptedException ex)  { Thread.currentThread().interrupt(); }
             
             while ( ! Aut.run ) 
                 Thread.sleep(100);
+            
+            
             // Créé un nouveau JPanel à chaque fois pour éviter que le graphique soit directement 
             // changé alors qu'il est affiché (sinon modifie l'affichage pour chaque changement de case)
-            
             synchronized(Obj)
             {
                 Aut.miseAJour();

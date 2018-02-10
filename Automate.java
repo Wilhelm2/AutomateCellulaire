@@ -7,6 +7,7 @@ public class Automate
 {
     ArrayList< ArrayList < Integer > > tab = new ArrayList < ArrayList<Integer> > ();
     int column,row;
+    int speed= 1;
     public boolean run = true;
             
             
