@@ -1,6 +1,7 @@
 
 import java.util.ArrayList ;
 import java.util.Random ;
+import javax.swing.JPanel;
 
 
 public class Automate
@@ -9,7 +10,7 @@ public class Automate
     int column,row;
     int speed= 1;
     public boolean run = true;
-            
+    JPanel Actual ;
             
     public Automate (  int row , int column,int beginCells)
     {

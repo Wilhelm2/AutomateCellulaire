@@ -16,6 +16,15 @@ import java.lang.Thread ;
 import java.awt.event.*;
 import javax.swing.JFormattedTextField ;
 import java.awt.Font;
+import javax.imageio.ImageIO ;
+import java.io.File ;
+import java.awt.image.BufferedImage ;
+import java.awt.Component ;
+
+
+
+
+
 
 
 
@@ -34,7 +43,7 @@ public class Affichage2 extends JPanel
         final JFrame frame= new JFrame();
         final Automate Aut = new Automate ( Integer.parseInt(args[0]), Integer.parseInt(args[1]), 10);
         Aut.DefaultSetting();
-        Historique History = new Historique();
+        final Historique History = new Historique();
         boolean changing = true;
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
@@ -110,6 +119,20 @@ public class Affichage2 extends JPanel
         toolbar.add(button);
         
         
+        button = new JButton( "Save Image");
+        button.addActionListener(new ActionListener(){
+            public void actionPerformed( ActionEvent ae )
+            {
+                BufferedImage bi = new BufferedImage(Aut.Actual.getSize().width, Aut.Actual.getSize().height, BufferedImage.TYPE_INT_ARGB); 
+                Graphics g = bi.createGraphics();
+                Aut.Actual.paint(g);  //this == JComponent
+                g.dispose();
+                try{ImageIO.write(bi,"png",new File("./Automate:"+Aut.row+ ":"+ Aut.column+ " E: " + History.index+".png"));}catch (Exception e) {}
+            }
+        });
+        toolbar.add(button);
+        
+        
         frame.add(toolbar, BorderLayout.NORTH);
 
         A = new Affichage2(Integer.parseInt(args[0]), Integer.parseInt(args[1]), Aut);
@@ -136,6 +159,7 @@ public class Affichage2 extends JPanel
                 Aut.miseAJour();
                 frame.remove(A);
                 A = new Affichage2(Integer.parseInt(args[0]), Integer.parseInt(args[1]), Aut);
+                Aut.Actual = A;
                 frame.add(A);
                 frame.pack();
                 dim = Toolkit.getDefaultToolkit().getScreenSize();
