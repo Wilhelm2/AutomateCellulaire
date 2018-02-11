@@ -12,7 +12,7 @@ public class Automate
     public boolean run = true;
     JPanel Actual ;
             
-    public Automate (  int row , int column,int beginCells)
+    public Automate (  int row , int column)
     {
         int tmp, tmp2;
         int i,j,k;
@@ -97,7 +97,7 @@ public class Automate
             return false;
     }
     
-    public 
+    
     
     
     public void DefaultSetting()

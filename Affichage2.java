@@ -36,12 +36,15 @@ public class Affichage2 extends JPanel
     static Affichage2 A;
     Color CelluleVivante = Color.BLUE;
     Color CelluleMorte = Color.WHITE;
+    static String DirectoryPATH = "./Image";
     
     public static void main(String[] args)
         throws IOException, InterruptedException 
     {
+        new File(DirectoryPATH).mkdir(); // créé le répertoire contenant les images
+        
         final JFrame frame= new JFrame();
-        final Automate Aut = new Automate ( Integer.parseInt(args[0]), Integer.parseInt(args[1]), 10);
+        final Automate Aut = new Automate ( Integer.parseInt(args[0]), Integer.parseInt(args[1]));
         //Aut.DefaultSetting();
         Aut.RandomSetting( 300 );
         
@@ -139,7 +142,19 @@ public class Affichage2 extends JPanel
                 Graphics g = bi.createGraphics();
                 Aut.Actual.paint(g);  //this == JComponent
                 g.dispose();
-                try{ImageIO.write(bi,"png",new File("./Automate:"+Aut.row+ ":"+ Aut.column+ " E: " + History.index+".png"));}catch (Exception e) {}
+                try{ImageIO.write(bi,"png",new File(DirectoryPATH+"/Automate:"+Aut.row+ ":"+ Aut.column+ " E: " + History.index+".png"));}catch (Exception e) {}
+                bi = new BufferedImage(Aut.Actual.getSize().width, Aut.Actual.getSize().height, BufferedImage.TYPE_INT_ARGB); 
+                Automate AtmpSave = new Automate( Aut.row, Aut.column );
+                Affichage2 tmpSave = new Affichage2(Aut.row,Aut.column, AtmpSave);
+                JFrame ftmp = new JFrame();
+                ftmp.add(tmpSave);
+                ftmp.pack();
+                AtmpSave.tab = History.History.get(0);
+                tmpSave.paintComponent( tmpSave.getGraphics());
+                Graphics g2 = bi.createGraphics();
+                tmpSave.paint(g2);
+                g2.dispose();
+                try{ImageIO.write(bi,"png",new File(DirectoryPATH+"/INIT:Automate:"+Aut.row+ ":"+ Aut.column+ " E: " + History.index+".png"));}catch (Exception e) {}
             }
         });
         toolbar.add(button);
