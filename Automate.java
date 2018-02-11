@@ -10,6 +10,7 @@ public class Automate
     int column,row;
     int speed= 1;
     public boolean run = true;
+    public boolean changing = true;
     JPanel Actual ;
             
     public Automate (  int row , int column)
@@ -109,6 +110,9 @@ public class Automate
             {
                 if( (i+j)%2 == 0)
                     tab.get(i).set(j,new Integer(1));
+                else
+                    tab.get(i).set(j,new Integer(0));
+                
             }
         }
         

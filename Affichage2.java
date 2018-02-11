@@ -45,11 +45,10 @@ public class Affichage2 extends JPanel
         
         final JFrame frame= new JFrame();
         final Automate Aut = new Automate ( Integer.parseInt(args[0]), Integer.parseInt(args[1]));
-        //Aut.DefaultSetting();
-        Aut.RandomSetting( 300 );
+        Aut.DefaultSetting();
+        //Aut.RandomSetting( 300 );
         
         final Historique History = new Historique();
-        boolean changing = true;
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
         JToolBar toolbar = new JToolBar();
@@ -134,7 +133,7 @@ public class Affichage2 extends JPanel
         toolbar.add(button);
         
         
-        button = new JButton( "Save Image");
+        button = new JButton("Save Image");
         button.addActionListener(new ActionListener(){
             public void actionPerformed( ActionEvent ae )
             {
@@ -160,6 +159,22 @@ public class Affichage2 extends JPanel
         toolbar.add(button);
         
         
+        button = new JButton("Restart");
+        button.addActionListener(new ActionListener(){
+            public void actionPerformed( ActionEvent ae )
+            {
+                Aut.DefaultSetting();
+                History.reset();
+                History.addEvnt(Aut.tab);
+                Etape.setText(  " "+ String.valueOf(History.index)+ "  " );
+                frame.repaint();
+                Aut.changing = true;
+            }
+        });
+        toolbar.add(button);
+        
+        
+        
         frame.add(toolbar, BorderLayout.NORTH);
 
         A = new Affichage2(Integer.parseInt(args[0]), Integer.parseInt(args[1]), Aut);
@@ -171,14 +186,13 @@ public class Affichage2 extends JPanel
         History.addEvnt(Aut.tab);
         Etape.setText( " "+ String.valueOf(History.index)+ "  ");
 
-        while(changing)
+        while(true)
         {
-            try { Thread.sleep(1000/ Aut.speed); } 
-                catch (InterruptedException ex)  { Thread.currentThread().interrupt(); }
-            
-            while ( ! Aut.run ) 
+            while ( ! Aut.run || !Aut.changing) 
                 Thread.sleep(100);
             
+            try { Thread.sleep(1000/ Aut.speed); } 
+                catch (InterruptedException ex)  { Thread.currentThread().interrupt(); }
             
             // Créé un nouveau JPanel à chaque fois pour éviter que le graphique soit directement 
             // changé alors qu'il est affiché (sinon modifie l'affichage pour chaque changement de case)
@@ -198,8 +212,14 @@ public class Affichage2 extends JPanel
                 if ( History.detectEnd())
                 {
                     System.out.println("FIN");
-                    changing = false;
+                    Aut.changing = false;
                 }
+                if ( History.detectCycle())
+                {
+                    System.out.println("Cycle détecté !");
+                    Aut.changing = false;
+                }
+
             }
         }
     }

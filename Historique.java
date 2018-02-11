@@ -71,11 +71,36 @@ public class Historique
         {
             for(j = 0 ; j < newState.get(0).size() ; j++)
             {
-                if ( newState.get(i).get(j) != oldState.get(i).get(j))
+                if ( newState.get(i).get(j).intValue() != oldState.get(i).get(j).intValue())
                     return false;
             }
         }
         return true;
+    }
+    
+    public boolean detectCycle()
+    {
+        int i,j;
+        if( History.size() < 3 )
+            return false;
+        ArrayList< ArrayList<Integer>> oldState = History.get( History.size() - 3);
+        ArrayList< ArrayList<Integer>> newState = History.get( History.size() - 1);
+        for(i = 0 ; i < newState.size() ; i ++)
+        {
+            for(j = 0 ; j < newState.get(0).size() ; j++)
+            {
+                if ( newState.get(i).get(j).intValue() != oldState.get(i).get(j).intValue())
+                    return false;
+            }
+        }
+        return true;
+    }
+    
+    public void reset()
+    {
+        History = new ArrayList< ArrayList< ArrayList<Integer>> > ();
+        index = 0;
+        maxindex = 0;
     }
     
 }
