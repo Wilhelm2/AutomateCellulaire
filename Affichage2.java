@@ -42,12 +42,22 @@ public class Affichage2 extends JPanel
     {
         final JFrame frame= new JFrame();
         final Automate Aut = new Automate ( Integer.parseInt(args[0]), Integer.parseInt(args[1]), 10);
-        Aut.DefaultSetting();
+        //Aut.DefaultSetting();
+        Aut.RandomSetting( 300 );
+        
         final Historique History = new Historique();
         boolean changing = true;
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
         JToolBar toolbar = new JToolBar();
+        JLabel L = new JLabel(" Étape :");
+        L.setFont(new Font("Courier", Font.BOLD,15));
+        toolbar.add( L);
+        
+        JLabel Etape = new JLabel(" "+ String.valueOf(History.index)+ "  ");
+        L.setFont(new Font("Courier", Font.BOLD,15));
+        toolbar.add( Etape);
+        
         
         JButton button = new JButton(new ImageIcon("arriere.png"));
         button.addActionListener(new ActionListener(){
@@ -61,6 +71,7 @@ public class Affichage2 extends JPanel
                     else
                     {
                         Aut.tab = History.arriere();
+                        Etape.setText(" "+ String.valueOf(History.index)+ "  ");
                         frame.repaint();
                     }
                 }
@@ -88,6 +99,7 @@ public class Affichage2 extends JPanel
                     else
                     {
                         Aut.tab = History.avant();
+                        Etape.setText( " "+ String.valueOf(History.index)+ "  ");
                         frame.repaint();
                     }
                 }
@@ -97,7 +109,7 @@ public class Affichage2 extends JPanel
         
         
         // SPEED
-        JLabel L = new JLabel(" Speed :");
+        L = new JLabel(" Speed :");
         L.setFont(new Font("Courier", Font.BOLD,15));
         toolbar.add( L);
         final JFormattedTextField F = new JFormattedTextField ();
@@ -142,6 +154,7 @@ public class Affichage2 extends JPanel
         frame.setLocation(dim.width/2-frame.getSize().width/2, dim.height/2-frame.getSize().height/2);
         frame.setVisible(true);
         History.addEvnt(Aut.tab);
+        Etape.setText( " "+ String.valueOf(History.index)+ "  ");
 
         while(changing)
         {
@@ -166,6 +179,7 @@ public class Affichage2 extends JPanel
                 frame.setLocation(dim.width/2-frame.getSize().width/2, dim.height/2-frame.getSize().height/2);
                 frame.setVisible(true);
                 History.addEvnt(Aut.tab);
+                Etape.setText( " "+ String.valueOf(History.index)+ "  ");
                 if ( History.detectEnd())
                 {
                     System.out.println("FIN");

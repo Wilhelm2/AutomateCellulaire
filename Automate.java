@@ -25,24 +25,6 @@ public class Automate
             for(j=0 ; j< column ; j++)
                 tab.get(i).add( new Integer(0) );
         }
-        
-        //~ Random generator = new Random(System.currentTimeMillis());
-        //~ for (i = 0 ; i < beginCells ; i++)
-        //~ {
-            //~ tmp = (int)( generator.nextDouble()*( row ) ) ;
-            //~ tmp2 = (int)( generator.nextDouble()*( column ) ) ;
-            //~ for( j = Math.max( tmp -1 , 0) ; j < Math.min(tmp+1, column) ; j++)
-            //~ {
-                //~ for(k = Math.max(tmp2-1,0) ; k < Math.min(tmp2 +1, row) ; k++)
-                //~ {
-                    //~ System.out.println(" j = "+ j + " et k = " + k);
-                    //~ if( ! ( j== tmp && k == tmp2) )
-                        //~ tab.get(k).set(j, new Integer(1) );
-                    //~ else 
-                        //~ return;
-                //~ }
-            //~ }
-        //~ }
     }
     
     public void changeState()
@@ -80,16 +62,12 @@ public class Automate
         }
     }
     
-
-    // Si 3 voisins vivants ->naît 
-    // Si vivante et entourée de 2 ou 3 cellules reste vivante
-    // Sinon meurt
-    public boolean JeuVieSimple( int row, int column, ArrayList<ArrayList<Integer>> Ltmp)
+    
+    
+    public int VoisinsVivants( int row, int column, ArrayList<ArrayList<Integer>> Ltmp )
     {
         int i,j;
-        int VoisinsVivants = 0;
-        boolean Vivant = (Ltmp.get(row).get(column).intValue() == 1);
-        
+        int Voisins = 0;
         for(i = ((row==0) ? 0: -1) ; i <= ((row == this.row-1) ? 0:1) ; i++)
         {
             for(j = ((column==0) ? 0: -1) ; j <= ((column == this.column-1) ? 0:1);j++)            
@@ -97,17 +75,30 @@ public class Automate
                 if ( i==0 && j== 0 ) // centre du "carré"
                     continue ;
                 if( Ltmp.get(row+i).get(column+j).intValue() == 1)
-                    VoisinsVivants ++;
+                    Voisins ++;
             }
         }
+        return Voisins;
+    }
+    // Si 3 voisins vivants ->naît 
+    // Si vivante et entourée de 2 ou 3 cellules reste vivante
+    // Sinon meurt
+    public boolean JeuVieSimple( int row, int column, ArrayList<ArrayList<Integer>> Ltmp)
+    {
+        int Voisins = VoisinsVivants(row,column, Ltmp);
+        boolean Vivant = (Ltmp.get(row).get(column).intValue() == 1);
         
-        if( VoisinsVivants == 3 && !Vivant )
+        
+        if( Voisins == 3 && !Vivant )
             return true;
-        else if( Vivant && ( VoisinsVivants == 2 || VoisinsVivants == 3) )
+        else if( Vivant && ( Voisins == 2 || Voisins == 3) )
             return true;
         else
             return false;
     }
+    
+    public 
+    
     
     public void DefaultSetting()
     {
@@ -121,6 +112,20 @@ public class Automate
             }
         }
         
+    }
+    
+    public void RandomSetting( int randomValues)
+    {
+        int i,k,j;
+        int tmp, tmp2;
+        Random generator = new Random(System.currentTimeMillis());
+        for (i = 0 ; i < randomValues ; i++)
+        {
+            tmp = (int)( generator.nextDouble()*( row ) ) ;
+            tmp2 = (int)( generator.nextDouble()*( column ) ) ;
+            tab.get(tmp).set(tmp2, new Integer(1));
+            
+        }
     }
     
     
