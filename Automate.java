@@ -9,9 +9,10 @@ public class Automate
     ArrayList< ArrayList < Integer > > tab = new ArrayList < ArrayList<Integer> > ();
     int column,row;
     int speed= 1;
-    public boolean run = true;
+    public boolean run = false;
     public boolean changing = true;
     JPanel Actual ;
+    Affichage2 Aff;
             
     public Automate (  int row , int column)
     {
@@ -98,7 +99,19 @@ public class Automate
             return false;
     }
     
+    public void setTab(int row, int column, ArrayList<ArrayList<Integer>> tab )
+    {
+        this.row = row;
+        this.column = column;
+        this.tab = tab;
+    }
     
+    public void setTab(ArrayList<ArrayList<Integer>> tab )
+    {
+        this.row = tab.size();
+        this.column = tab.get(0).size();
+        this.tab = tab;
+    }
     
     
     public void DefaultSetting()
@@ -120,9 +133,15 @@ public class Automate
     
     public void RandomSetting( int randomValues)
     {
-        int i,k,j;
+        int i,j;
         int tmp, tmp2;
         Random generator = new Random(System.currentTimeMillis());
+        for (i = 0 ; i < row ; i++)
+        {
+            for (j = 0 ; j < column ; j++)
+                tab.get(i).set(j, new Integer(0));
+        }
+        
         for (i = 0 ; i < randomValues ; i++)
         {
             tmp = (int)( generator.nextDouble()*( row ) ) ;

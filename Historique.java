@@ -65,8 +65,10 @@ public class Historique
     public boolean detectEnd ()
     {
         int i,j;
-        ArrayList< ArrayList<Integer>> oldState = History.get( History.size() - 2);
-        ArrayList< ArrayList<Integer>> newState = History.get( History.size() - 1);
+        if (index < 2)
+            return false;
+        ArrayList< ArrayList<Integer>> oldState = History.get( index - 2);
+        ArrayList< ArrayList<Integer>> newState = History.get( index - 1);
         for(i = 0 ; i < newState.size() ; i ++)
         {
             for(j = 0 ; j < newState.get(0).size() ; j++)
@@ -81,10 +83,10 @@ public class Historique
     public boolean detectCycle()
     {
         int i,j;
-        if( History.size() < 3 )
+        if( index < 3 )
             return false;
-        ArrayList< ArrayList<Integer>> oldState = History.get( History.size() - 3);
-        ArrayList< ArrayList<Integer>> newState = History.get( History.size() - 1);
+        ArrayList< ArrayList<Integer>> oldState = History.get( index - 3);
+        ArrayList< ArrayList<Integer>> newState = History.get( index - 1);
         for(i = 0 ; i < newState.size() ; i ++)
         {
             for(j = 0 ; j < newState.get(0).size() ; j++)
