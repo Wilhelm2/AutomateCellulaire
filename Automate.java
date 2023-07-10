@@ -2,11 +2,11 @@
 import java.util.ArrayList ;
 import java.util.Random ;
 import javax.swing.JPanel;
-
+import java.util.Collections;
 
 public class Automate
 {
-    ArrayList< ArrayList < Integer > > tab = new ArrayList < ArrayList<Integer> > ();
+    ArrayList<ArrayList<Integer>> tab = new ArrayList <ArrayList<Integer>>();
     int column,row;
     int speed= 1;
     public boolean run = false;
@@ -14,21 +14,30 @@ public class Automate
     JPanel Actual ;
     Affichage2 Aff;
             
-    public Automate (  int row , int column)
+    public Automate(int row, int column)
     {
-        int tmp, tmp2;
-        int i,j,k;
         this.column = column;
         this.row = row;
-        
-        for(i=0 ; i < row ; i++)
-        {
-            tab.add( new ArrayList<Integer>() ) ;
-            for(j=0 ; j< column ; j++)
-                tab.get(i).add( new Integer(0) );
-        }
+        initializeEmptyBoard();
+    }
+
+    public Automate(ArrayList<ArrayList<Integer>> tab)
+    {
+        this.tab = tab;
+        this.row = tab.size();
+        this.column = tab.get(0).size();
     }
     
+    public void initializeEmptyBoard()
+    {
+        for(int i=0 ; i < row ; i++)
+        {
+            tab.add(new ArrayList<Integer>());
+            for(int j=0; j < column; j++)
+                tab.get(i).add(Integer.valueOf(0));
+        }
+    }
+
     public void changeState()
     {
         run = !run;
@@ -36,35 +45,32 @@ public class Automate
     
     public void miseAJour()
     {
-        int i,j;
         // commence par faire une copie du tableau
-        ArrayList< ArrayList<Integer> > Ltmp = new  ArrayList< ArrayList <Integer>> ();
-        for( i = 0 ; i< row;i++)
+        ArrayList< ArrayList<Integer> > Ltmp = new ArrayList< ArrayList <Integer>> ();
+        for(int i = 0 ; i< row;i++)
         {
             Ltmp.add( new ArrayList<Integer>() ) ;
-            for(j=0; j < column;j++)
-                Ltmp.get(i).add( new Integer(tab.get(i).get(j).intValue())) ; 
+            for(int j=0; j < column;j++)
+                Ltmp.get(i).add( Integer.valueOf(tab.get(i).get(j).intValue())) ; 
         }
         
-        for( i = 0 ; i< row;i++)
+        for(int i = 0 ; i< row;i++)
         {
-            for(j=0; j < column;j++)
+            for(int j=0; j < column;j++)
             {
                 if( JeuVieSimple(i,j,Ltmp) )
                 {
                     if( Ltmp.get(i).get(j).intValue() == 0) // cellule morte -> changement
-                        tab.get(i).set(j, new Integer(1));
+                        tab.get(i).set(j, Integer.valueOf(1));
                 }
                 else
                 {
                     if( Ltmp.get(i).get(j).intValue() == 1) // cellule morte -> changement
-                        tab.get(i).set(j, new Integer(0));
+                        tab.get(i).set(j, Integer.valueOf(0));
                 }
             }
         }
     }
-    
-    
     
     public int VoisinsVivants( int row, int column, ArrayList<ArrayList<Integer>> Ltmp )
     {
@@ -114,42 +120,31 @@ public class Automate
     }
     
     
-    public void DefaultSetting()
+    public void ChessBoard()
     {
-        int i,j;
-        for(i=0;i<row; i++)
+        for(int i=0;i<row; i++)
         {
-            for(j=0;j<column;j++)
+            for(int j=0;j<column;j++)
             {
                 if( (i+j)%2 == 0)
-                    tab.get(i).set(j,new Integer(1));
+                    tab.get(i).set(j,Integer.valueOf(1));
                 else
-                    tab.get(i).set(j,new Integer(0));
-                
+                    tab.get(i).set(j,Integer.valueOf(0));
             }
         }
-        
     }
     
-    public void RandomSetting( int randomValues)
+    public void RandomSetting(int nbInitialLivingCells)
     {
-        int i,j;
-        int tmp, tmp2;
+        int randRow, randColumn;
         Random generator = new Random(System.currentTimeMillis());
-        for (i = 0 ; i < row ; i++)
-        {
-            for (j = 0 ; j < column ; j++)
-                tab.get(i).set(j, new Integer(0));
-        }
+        initializeEmptyBoard();
         
-        for (i = 0 ; i < randomValues ; i++)
+        for (int i = 0 ; i < nbInitialLivingCells ; i++)
         {
-            tmp = (int)( generator.nextDouble()*( row ) ) ;
-            tmp2 = (int)( generator.nextDouble()*( column ) ) ;
-            tab.get(tmp).set(tmp2, new Integer(1));
-            
+            randRow = (int)( generator.nextDouble()*(row) ) ;
+            randColumn = (int)( generator.nextDouble()*(column) ) ;
+            tab.get(randRow).set(randColumn, Integer.valueOf(1));
         }
-    }
-    
-    
+    }    
 }

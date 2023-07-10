@@ -22,10 +22,6 @@ public class Parser
     static  ArrayList< ArrayList<Integer>> ParseFile ( String FileName) 
         throws IOException
     {
-        int row, column;
-        int i,j,x,y;
-        int debut = 0, fin= 0;
-        ArrayList< ArrayList<Integer>> List = new ArrayList< ArrayList<Integer>>();
         File F = new File (FileName);
         if (! F.exists() )
         {
@@ -33,76 +29,66 @@ public class Parser
             return null;
         }
         
+        ArrayList< ArrayList<Integer>> board = new ArrayList< ArrayList<Integer>>();
         try(BufferedReader br = new BufferedReader(new FileReader(F)))
         {
-            String l = br.readLine();
-            while (fin < l.length() && l.charAt(fin) >= '0' && l.charAt(fin) <= '9')
+            String line;
+            while((line = br.readLine()) != null)
             {
-                System.out.println("lit le car " + l.charAt(fin));
-                fin ++;
+                ArrayList<Integer> currLine = new ArrayList<Integer>();
+                String[] numbersString = line.split(" ");
+                for(String cell : numbersString)
+                    currLine.add(Integer.parseInt(cell));                    
+                board.add(currLine);
             }
-            column = Integer.parseInt( l.substring(debut,fin)) ;
-            debut = fin ; 
-            fin ++;
-            while (fin < l.length() && l.charAt(fin) >= '0' && l.charAt(fin) <= '9')
-                fin ++;
-            row = Integer.parseInt( l.substring(debut+1,fin)) ;
-            
-            for ( i = 0; i < row ; i++) // initialisation
+        }        
+        return board;
+    }
+
+    static JButton createSetupCell()
+    {
+        JButton setupCell = new JButton("" );
+        setupCell.setOpaque(true);
+        setupCell.setBackground(Color.WHITE);
+        setupCell.setPreferredSize(new Dimension(20, 20));
+        setupCell.addActionListener(new ActionListener(){
+        public void actionPerformed( ActionEvent ae )
             {
-                List.add(new ArrayList<Integer>());
-                for (j = 0 ; j < column ; j++)
-                    List.get(i).add( new Integer(0));
+                setupCell.setBackground(Color.BLUE);
             }
-            
-            while(( l = br.readLine()) != null )
-            {
-                debut = 0; fin = 0;
-                while (fin < l.length() && l.charAt(fin) >= '0' && l.charAt(fin) <= '9')
-                    fin ++;
-                x = Integer.parseInt( l.substring(debut,fin)) ;
-                debut = fin ; 
-                fin ++;
-                while ( fin < l.length() &&l.charAt(fin) >= '0' && l.charAt(fin) <= '9')
-                    fin ++;
-                y = Integer.parseInt( l.substring(debut+1,fin)) ;
-                List.get(x).set(y, new Integer(1));
-            }
-        }
-        
-        return List;
+        });
+        return setupCell;
+    }
+
+    static void displayAddedCell(int row, int column, JFrame frame, JButton setupCell)
+    {
+        GridBagConstraints gc = new GridBagConstraints();
+        gc.gridx = column;
+        gc.gridy = row;
+        frame.add(setupCell, gc);
+    }
+
+    static boolean isCellSet(JButton button)
+    {
+        return button.getBackground() == Color.BLUE;
     }
     
-    static void ParseSelfInput ( int row, int column, final Affichage2 A, final JFrame mainFrame, final Historique History, final JLabel Etape) 
+    static void ParseSelfInput (int row, int column, final Affichage2 A, final JFrame mainFrame, final Historique History, final JLabel Etape) 
     {
-        int i,j;
-        
         GridBagConstraints gc = new GridBagConstraints();
         final JFrame frame = new JFrame();
         
         frame.setLayout(new GridBagLayout());
-        final ArrayList< ArrayList <JButton>>  L= new ArrayList< ArrayList <JButton>> ();
+        final ArrayList< ArrayList <JButton>>  board= new ArrayList< ArrayList <JButton>> ();
         
-        for(i=0 ; i < row ; i++)
+        for(int i=0 ; i < row ; i++)
         {
-            L.add( new ArrayList<JButton>() ) ;
-            for(j=0 ; j< column ; j++)
+            board.add( new ArrayList<JButton>() ) ;
+            for(int j=0 ; j< column ; j++)
             {
-                final JButton Ltmp = new JButton("" ); // doit rester ici sinon le même jlabel est utilisé partout
-                Ltmp.setOpaque(true);
-                Ltmp.setBackground(Color.WHITE);
-                Ltmp.setPreferredSize(new Dimension(20, 20));
-                Ltmp.addActionListener(new ActionListener(){
-                    public void actionPerformed( ActionEvent ae )
-                    {
-                        Ltmp.setBackground(Color.BLUE);
-                    }
-                });
-                
-                L.get(i).add( Ltmp );
-                gc.gridx = j;
-                gc.gridy = i;
-                frame.add(Ltmp, gc);
+                final JButton setupCell = createSetupCell();
+                board.get(i).add(setupCell);
+                displayAddedCell(i, j, frame, setupCell);
             }
             
         }
@@ -110,31 +96,28 @@ public class Parser
         Ltmp.addActionListener(new ActionListener(){
             public void actionPerformed( ActionEvent ae )
             {
-                int i,j;
-                ArrayList< ArrayList<Integer>> List = new ArrayList< ArrayList<Integer>>();
-                for(i= 0; i < row; i ++)
+                ArrayList< ArrayList<Integer>> resBoard = new ArrayList< ArrayList<Integer>>();
+                for(int i= 0; i<row; i++)
                 {
-                    List.add( new ArrayList<Integer>());
-                    for(j=0;j<column;j++)
+                    resBoard.add( new ArrayList<Integer>());
+                    for(int j=0; j<column; j++)
                     {
-                        if ( L.get(i).get(j).getBackground() == Color.WHITE)
-                            List.get(i).add( new Integer(0) );
+                        if(isCellSet(board.get(i).get(j)))
+                            resBoard.get(i).add(Integer.valueOf(1));
                         else
-                            List.get(i).add( new Integer(1) );
+                            resBoard.get(i).add(Integer.valueOf(0));
                     }
                 }
                 frame.dispose();
-                A.ReglageAMain( List,mainFrame, History,Etape);
+                A.ReglageAMain( resBoard,mainFrame, History,Etape);
             }
         });
-        gc.gridx = column;
-        gc.gridy = row;
-        frame.add(Ltmp,gc);
+        
+        displayAddedCell(row, column, frame, Ltmp);
         
         frame.pack();
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
         frame.setLocation(dim.width/2-frame.getSize().width/2, dim.height/2-frame.getSize().height/2);
         frame.setVisible(true);
-        
     }
 }

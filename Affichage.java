@@ -28,7 +28,7 @@ public class Affichage extends JFrame
     public static void main(String[] args)
         throws IOException, InterruptedException 
     {
-        Aut = new Automate ( Integer.parseInt(args[0]), Integer.parseInt(args[1]), 10);
+        Aut = new Automate(Integer.parseInt(args[0]), Integer.parseInt(args[1])); //, 10);
         A = new Affichage(Integer.parseInt(args[0]), Integer.parseInt(args[1]));
         
     }
