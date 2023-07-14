@@ -1,5 +1,6 @@
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.JLabel;
 import javax.swing.ImageIcon;
 import java.io.IOException;
@@ -21,301 +22,280 @@ import java.io.File;
 import java.awt.image.BufferedImage;
 import java.awt.Component;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JOptionPane;
+import java.awt.GridBagLayout;
 
 public class Affichage2 extends JPanel {
-    Automate Aut;
-    static final Object Obj = new Object(); // évite de faire des actions pendant que la prochaine étape est calculée
-    static Affichage2 A;
-    Color CelluleVivante = Color.BLUE;
-    Color CelluleMorte = Color.WHITE;
-    static String DirectoryPATH = "./Image";
+    JToolBar toolbar = new JToolBar(); // contains the screen elements except the board
+    JLabel stepCounter; // Counts the number of steps since the initial position
+    DrawBoard db; // Class that draws the game board in order to print it on the screen 
+    JFormattedTextField speedField; // Field that contains the game speed
+    int speed = 1; // Initial speed is 1 update every second. speed = 10 means 10 updates per second
+    boolean isRunning = false; // true: the board is evolving every turn, false: the board does not evolve 
+    static String DirectoryPATH = "./Image"; // Path to the directory to which will store saved images
 
-    static final JFrame frame = new JFrame();
+    final JFrame frame = new JFrame();
 
-    static public void addSimpleJlabel(String labelName, JToolBar toolbar) {
-        JLabel L = new JLabel(labelName);
-        L.setFont(new Font("Courier", Font.BOLD, 15));
-        toolbar.add(L);
-    }
-
-    static public void setFrame() {
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-    }
-
-    public static void main(String[] args)
+    Affichage2 (Automate gameEngine)
         throws IOException, InterruptedException 
     {
-        new File(DirectoryPATH).mkdir(); // créé le répertoire contenant les images
-        
-        final Automate Aut = new Automate ( Integer.parseInt(args[0]), Integer.parseInt(args[1]));
-        Aut.ChessBoard();
-        //Aut.RandomSetting( 300 );
-        
-        final Historique History = new Historique();
-        
-        setFrame();
-
-        JToolBar toolbar = new JToolBar();
-
-        addSimpleJlabel(" Step: ", toolbar);
-        
-        JLabel StepCounter = new JLabel(" "+ String.valueOf(History.index)+ "  ");
-        StepCounter.setFont(new Font("Courier", Font.BOLD,15));
-        toolbar.add(StepCounter);
-        
-        
-        JButton button = new JButton(new ImageIcon("arriere.png"));
-        button.addActionListener(new ActionListener(){
-            public void actionPerformed( ActionEvent ae )
-            {
-                System.out.println("va en arrière");
-                synchronized(Obj)
-                {
-                    if( History.index == 0 )
-                        return;
-                    else
-                    {
-                        Aut.tab = History.arriere();
-                        StepCounter.setText(" "+ String.valueOf(History.index)+ "  ");
-                        frame.repaint();
-                    }
-                }
-            }
-        });
-        toolbar.add(button);
-        
-        button = new JButton(new ImageIcon("stop.png"));
-        button.addActionListener(new ActionListener(){
-            public void actionPerformed( ActionEvent ae )
-            {
-                Aut.changeState();
-            }
-        });
-        toolbar.add(button);
-        
-        button = new JButton(new ImageIcon("avant.png"));
-        button.addActionListener(new ActionListener(){
-            public void actionPerformed( ActionEvent ae )
-            {
-                synchronized(Obj)
-                {
-                    if( History.index == History.maxindex ) 
-                        return ;
-                    else
-                    {
-                        Aut.tab = History.avant();
-                        StepCounter.setText( " "+ String.valueOf(History.index)+ "  ");
-                        frame.repaint();
-                    }
-                }
-            }
-        });
-        toolbar.add(button);
-        
-        addSimpleJlabel(" Speed: ", toolbar);
-
-        final JFormattedTextField F = new JFormattedTextField ();
-        F.setPreferredSize( new Dimension(40, 30) );
-        F.setMaximumSize( new Dimension(30, 30) );
-        toolbar.add(F);
-        
-        button = new JButton( "OK");
-        button.addActionListener(new ActionListener(){
-            public void actionPerformed( ActionEvent ae )
-            {
-                int speed;
-                try
-                {speed = Integer.parseInt(F.getText(),10);}
-                catch ( NumberFormatException e) { System.out.println("Mauvais format"); return;};
-                Aut.speed = speed;
-            }
-        });
-        toolbar.add(button);
-        
-        
-        button = new JButton("Save Image");
-        button.addActionListener(new ActionListener(){
-            public void actionPerformed( ActionEvent ae )
-            {
-                saveAutomateStateToImage(Aut, "/Automate:"+Aut.row+ ":"+ Aut.column+ " E: " + History.index+".png");
-
-                // BufferedImage bi = new BufferedImage(Aut.Actual.getSize().width, Aut.Actual.getSize().height, BufferedImage.TYPE_INT_ARGB); 
-                // Graphics g = bi.createGraphics();
-                // Aut.Actual.paint(g);  //this == JComponent
-                // g.dispose();
-                // try{ImageIO.write(bi,"png",new File(DirectoryPATH+"/Automate:"+Aut.row+ ":"+ Aut.column+ " E: " + History.index+".png"));}catch (Exception e) {}
-
-                saveAutomateStateToImage(new Automate(History.History.get(0)), "/INIT:Automate:"+Aut.row+ ":"+ Aut.column+ " E: " + History.index+".png");
-                // BufferedImage bi = new BufferedImage(Aut.Actual.getSize().width, Aut.Actual.getSize().height, BufferedImage.TYPE_INT_ARGB); 
-                // Graphics g = bi.createGraphics();
-                // Automate InitialAutomateState = History.History[0]; // initial automate state
-                // Affichage2 windowToSave = new Affichage2(InitialAutomateState);
-                // InitialAutomateState.Actual.paint(g);
-                // g.dispose();
-                // try{ImageIO.write(bi,"png",new File(DirectoryPATH+"/INIT:Automate:"+Aut.row+ ":"+ Aut.column+ " E: " + History.index+".png"));}catch (Exception e) {}
-           
-            }
-        });
-        toolbar.add(button);
-        
-        
-        button = new JButton("Restart");
-        button.addActionListener(new ActionListener(){
-            public void actionPerformed( ActionEvent ae )
-            {
-                Aut.ChessBoard();
-                History.reset();
-                History.addEvnt(Aut.tab);
-                StepCounter.setText(  " "+ String.valueOf(History.index)+ "  " );
-                frame.repaint();
-                Aut.changing = true;
-            }
-        });
-        toolbar.add(button);
-        
-        
-        final JComboBox<String> comboxStartConditions = createStartConditionChoiceBox(Aut, History, StepCounter);
-        
-        toolbar.add(comboxStartConditions);        
-        frame.add(toolbar, BorderLayout.NORTH);
-
-        newAffichage(Aut, History, StepCounter);
-        
-        game(Aut, History, StepCounter);
+        setInitialFrame(gameEngine);
     }
 
-    static public JComboBox<String>  createStartConditionChoiceBox(Automate Aut, Historique History, JLabel StepCounter)
+    // Sets the initial screen with an empty board
+    public void setInitialFrame(Automate gameEngine)
+        throws IOException, InterruptedException 
     {
-        String  []StartConditions = { "Damier", "Aléatoire", "Réglage à la main", "Importer fichier"};
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        toolbar.add(createSimpleJlabel(" Step: "));
+        stepCounter = createSimpleJlabel(" "+ String.valueOf(gameEngine.gameHistory.currIndex)+ "  ");
+        toolbar.add(stepCounter);
+
+        toolbar.add(createStepBackButton(gameEngine));
+        toolbar.add(createStopButton(gameEngine));
+        toolbar.add(createStepForwardButton(gameEngine));
+        
+        toolbar.add(createSimpleJlabel(" Speed: "));
+        speedField = createTextField();
+        toolbar.add(speedField);        
+        toolbar.add(createSpeedTextFieldConfirmButton(speedField));
+        
+        toolbar.add(createSaveButton(gameEngine));
+        toolbar.add(createResetButton(gameEngine));
+        
+        toolbar.add(createStartConditionChoiceBox(gameEngine));
+        toolbar.add(createResizeBoardButton(frame, gameEngine));
+
+        frame.add(toolbar, BorderLayout.NORTH);
+
+        db = new DrawBoard(gameEngine);
+        frame.add(db);
+
+        frame.pack();
+        Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+        frame.setLocation(dim.width / 2 - frame.getSize().width / 2, dim.height / 2 - frame.getSize().height / 2);
+        frame.setVisible(true);
+    }
+
+    public JLabel createSimpleJlabel(String labelName) 
+    {
+        JLabel label = new JLabel(labelName);
+        label.setFont(new Font("Courier", Font.BOLD, 15));
+        return label;
+    }
+
+    public JButton createStepBackButton(Automate gameEngine)
+    {
+        JButton button = new JButton(new ImageIcon("arriere.png"));
+        button.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent ae)
+            {
+                synchronized(this)
+                {
+                    if(gameEngine.gameHistory.isInInitialState())
+                    {
+                        System.out.println("Already in initial state");
+                        return;
+                    }
+                    else
+                    {
+                        System.out.println("Goes back!");
+                        gameEngine.gameBoard = gameEngine.gameHistory.goOneBackward();
+                        updateStepCounter(gameEngine.gameHistory.currIndex);
+                        frame.repaint();
+                    }
+                }
+            }
+        });
+        return button;
+    }
+
+    public JButton createStopButton(Automate gameEngine)
+    {
+        JButton button = new JButton(new ImageIcon("stop.png"));
+        button.addActionListener(new ActionListener(){
+            public void actionPerformed( ActionEvent ae )
+            {
+                if(!(gameEngine.gameHistory.detectCycle() || gameEngine.gameHistory.detectEnd() || gameEngine.gameBoard.isAllDead()))
+                    isRunning = !isRunning;
+            }
+        });
+        return button;
+    }
+
+    public JButton createStepForwardButton(Automate gameEngine)
+    {
+        JButton button = new JButton(new ImageIcon("avant.png"));
+        button.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent ae)
+            {
+                synchronized(this)
+                {
+                    if(gameEngine.gameHistory.isMaxState())
+                    {
+                        System.out.println("Is at max state");
+                        return ;
+                    }
+                    else
+                    {
+                        System.out.println("Goes one forward");
+                        gameEngine.gameBoard = gameEngine.gameHistory.goOneForward();
+                        updateStepCounter(gameEngine.gameHistory.currIndex);
+                        frame.repaint();
+                    }
+                }
+            }
+        });
+        return button;
+    }
+
+    public void updateStepCounter(int step)
+    {
+        stepCounter.setText(" " + step + "  ");
+    }
+
+    public JFormattedTextField createTextField()
+    {
+        JFormattedTextField textField = new JFormattedTextField();
+        textField.setPreferredSize(new Dimension(40, 30));
+        textField.setMaximumSize(new Dimension(30, 30));
+        return textField;
+    }
+
+    public JButton createSpeedTextFieldConfirmButton(JFormattedTextField field)
+    {
+        JButton button = new JButton("OK");
+        button.addActionListener(new ActionListener(){
+            public void actionPerformed( ActionEvent ae )
+            {
+                try {
+                    speed = Integer.parseInt(field.getText()); //,10);
+                } catch ( NumberFormatException e) {System.out.println("Bad format"); return;};
+            }
+        });
+        return button;
+    }
+
+    public JButton createSaveButton(Automate gameEngine)
+    {
+        JButton button = new JButton("Save Image");
+        button.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent ae)
+            {
+                saveAutomateStateToImage(gameEngine, "/Automate:"+ gameEngine.gameBoard.rows + ":" + gameEngine.gameBoard.columns + " E: " + gameEngine.gameHistory.currIndex +".png");
+                saveAutomateStateToImage(new Automate(gameEngine.gameHistory.gameHistory.get(0).board), "/INIT:Automate:" + gameEngine.gameBoard.rows + ":" + gameEngine.gameBoard.columns + " E: " + gameEngine.gameHistory.currIndex + ".png");           
+            }
+        });
+        return button;
+    }
+
+    public void saveAutomateStateToImage(Automate gameEngine, String filePath)
+    {
+        DrawBoard dbSave = new DrawBoard(gameEngine);
+        dbSave.setSize(new Dimension(gameEngine.gameBoard.columns*20, gameEngine.gameBoard.rows*20)); // needs to be called otherwise size = 0 and repaint() is not called (for optimization since there would be nothing to print)
+        dbSave.revalidate();
+        dbSave.repaint();
+        dbSave.setVisible(true);
+
+        BufferedImage imageToSave = new BufferedImage(db.getSize().width, db.getSize().height, BufferedImage.TYPE_INT_ARGB); 
+        Graphics graph = imageToSave.createGraphics();
+        dbSave.printAll(graph); 
+        graph.dispose();
+        try{ImageIO.write(imageToSave,"png",new File(DirectoryPATH+filePath));}catch (Exception e) {}
+    }
+
+    public JButton createResetButton(Automate gameEngine)
+    {
+        JButton button = new JButton("Reset");
+        button.addActionListener(new ActionListener(){
+            public void actionPerformed( ActionEvent ae )
+            {
+                gameEngine.reset();
+                updateStepCounter(0);          
+                frame.repaint();
+            }
+        });
+        return button;
+    }
+
+    public JComboBox<String>  createStartConditionChoiceBox(Automate gameEngine)
+    {
+        String  []StartConditions = {"Choice", "Random", "Chessboard", "Import File", "Self input"};
         final JComboBox<String> comboxStartConditions = new JComboBox<>(StartConditions);
         comboxStartConditions.addActionListener(new ActionListener(){
             public void actionPerformed( ActionEvent ae )
             {
                 String select = comboxStartConditions.getSelectedItem().toString();
-                if ( select.equals("Aléatoire") )
-                    Aut.RandomSetting(100);
-                else if ( select.equals("Damier") )
-                    Aut.ChessBoard();
-                else if ( select.equals("Importer fichier") )
+                if (select.equals("Choice"))
+                    ; // does nothing
+                if (select.equals("Random"))
+                    gameEngine.RandomSetting(100);
+                else if (select.equals("Chessboard"))
+                    gameEngine.ChessBoard();
+                else if (select.equals("Import File"))
                 {
-                    ArrayList<ArrayList<Integer>> Ltmp;
-                    String fileName = JOptionPane.showInputDialog( frame, "Nom du fichier", null);
-                    try{Ltmp = Parser.ParseFile( fileName );}
-                        catch ( IOException e) { System.out.println("Fichier n'existe pas"); return;};
-                    Aut.setTab( Ltmp.size(), Ltmp.get(0).size(), Ltmp);
+                    String fileName = JOptionPane.showInputDialog(frame, "Filename", null);
+                    try{
+                        gameEngine.reset(Parser.ParseFile(fileName));
+                    }
+                        catch (IOException e) { System.out.println("File not found"); return;};
                 }
-                else 
+                else if(select.equals("Self input")) 
                 {
-                    Parser.ParseSelfInput( Aut.row, Aut.column, Aut.Aff,frame, History,StepCounter);
-                    return ;
+                    Parser.ParseSelfInput(gameEngine, frame);
+//                    db.gameEngine = gameEngine;
                 }
-                
+
+                if(!select.equals("Choice")) // selected a new game configuration
+                {
+                    updateStepCounter(0);
+                }
                 frame.repaint();
-                History.reset();
-                History.addEvnt(Aut.tab);
-                StepCounter.setText(" "+ String.valueOf(History.index)+ "  " );
-                Aut.changing = true;
-                Aut.run = false;
             }
         });
         return comboxStartConditions;
     }
 
-    static public void game(Automate Aut, Historique History, JLabel StepCounter)
-            throws IOException, InterruptedException {
-        while (true) {
-            while (!Aut.changing)
-                Thread.sleep(100);
-
-            try {
-                Thread.sleep(1000 / Aut.speed);
-            } catch (InterruptedException ex) {
-                Thread.currentThread().interrupt();
-            }
-            while (!Aut.run)
-                Thread.sleep(100);
-
-            // Créé un nouveau JPanel à chaque fois pour éviter que le graphique soit
-            // directement
-            // changé alors qu'il est affiché (sinon modifie l'affichage pour chaque
-            // changement de case)
-            synchronized (Obj) {
-                Aut.miseAJour();
-                frame.remove(A);
-
-                Aut.Actual = newAffichage(Aut, History, StepCounter);
-
-                if (History.detectEnd()) {
-                    System.out.println("FIN");
-                    Aut.changing = false;
-                }
-                if (History.detectCycle()) {
-                    System.out.println("Cycle détecté !");
-                    Aut.changing = false;
-                }
-
-            }
-        }
-    }
-
-    public static void saveAutomateStateToImage(Automate Auto, String filePath)
+    JButton createResizeBoardButton(JFrame mainFrame, Automate gameEngine)
     {
-        BufferedImage imageToSave = new BufferedImage(Auto.Actual.getSize().width, Auto.Actual.getSize().height, BufferedImage.TYPE_INT_ARGB); 
-        Graphics graph = imageToSave.createGraphics();
-        Auto.Actual.paint(graph);  //this == JComponent
-        graph.dispose();
-        try{ImageIO.write(imageToSave,"png",new File(DirectoryPATH+filePath));}catch (Exception e) {}
-    }
-
-
-    static public Affichage2 newAffichage(Automate Aut, Historique History, JLabel Etape) {
-        A = new Affichage2(Aut);
-        frame.add(A);
-        frame.pack();
-        Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-        frame.setLocation(dim.width / 2 - frame.getSize().width / 2, dim.height / 2 - frame.getSize().height / 2);
-        frame.setVisible(true);
-        History.addEvnt(Aut.tab);
-        Etape.setText(" " + String.valueOf(History.index) + "  ");
-        return A;
-    }
-
-    public void paintComponent(Graphics g) {
-        int i, j;
-        super.paintComponent(g);
-        for (i = 1; i < Aut.row; i++)
-            g.drawLine(0, 20 * i, Aut.column * 20, 20 * i);
-        for (i = 1; i < Aut.column; i++)
-            g.drawLine(20 * i, 0, 20 * i, Aut.row * 20);
-
-        for (i = 0; i < Aut.row; i++) {
-            for (j = 0; j < Aut.column; j++) {
-                if (Aut.tab.get(i).get(j).intValue() == 1)
-                    g.setColor(CelluleVivante);
-                else
-                    g.setColor(CelluleMorte);
-                g.fillOval(j * 20, i * 20, 20, 20);
+        JButton button = new JButton("Resize Board");
+        button.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent ae)
+            {
+                JDialog resizeBox = new JDialog(mainFrame, "Input");
+                resizeBox.setLayout(new GridBagLayout());
+                resizeBox.setModal(true);
+                resizeBox.add(createSimpleJlabel("rows:"));
+                JTextField inputRows = createTextField();
+                resizeBox.add(inputRows);
+                resizeBox.add(createSimpleJlabel("columns:"));
+                JTextField inputColumns = createTextField();
+                resizeBox.add(inputColumns);
+                resizeBox.add(createResizeBoardConfirmButton(gameEngine, inputRows, inputColumns, mainFrame, resizeBox));
+                resizeBox.pack();
+                Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+                resizeBox.setLocation(dim.width/2-resizeBox.getSize().width/2, dim.height/2-resizeBox.getSize().height/2);
+                resizeBox.setVisible(true);
             }
-        }
+        });
+        return button;
     }
 
-    Affichage2(Automate Aut) {
-        this.setPreferredSize(new Dimension(Aut.column * 20, Aut.row * 20));
-        this.Aut = Aut;
-        Aut.Aff = this;
+    public JButton createResizeBoardConfirmButton(Automate gameEngine, JTextField inputRows, JTextField inputColumns, JFrame mainFrame, JDialog resizeBox)
+    {
+        JButton button = new JButton("Confirm");
+        button.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent ae)
+            {
+                gameEngine.reset(new Board(Integer.parseInt(inputRows.getText()), Integer.parseInt(inputColumns.getText())));                
+                resizeBox.dispose();
+                updateStepCounter(gameEngine.gameHistory.currIndex);
+                mainFrame.pack();
+                mainFrame.repaint();
+            }
+        });
+        return button;
     }
-
-    public void ReglageAMain(ArrayList<ArrayList<Integer>> List, JFrame frame, Historique History, JLabel Etape) {
-        Aut.setTab(List);
-        frame.repaint();
-        History.reset();
-        History.addEvnt(Aut.tab);
-        Etape.setText(" " + String.valueOf(History.index) + "  ");
-        Aut.changing = true;
-        Aut.run = false;
-        return;
-    }
-
 }

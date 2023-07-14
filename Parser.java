@@ -15,18 +15,26 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JButton ;
 import javax.swing.JLabel;
+import javax.swing.JDialog;
 
-
+// Class with two functions to set the gameBoard. One reads files and the other displays a gameboard to take the input directly form the user. 
 public class Parser
 {
-    static  ArrayList< ArrayList<Integer>> ParseFile ( String FileName) 
+    /* Reads the board from a file and returns it
+     * Format: O: living cell, X: dead cell. Cells are separated by spaces
+     * Example:
+     * X O X    -> line of 3 cells with the middle cell living
+     * X X O    -> line of 3 cells with the last cell living
+     * O O X    -> line of 3 cells with the two first cells living
+    */
+    static Board ParseFile(String FileName) 
         throws IOException
     {
-        File F = new File (FileName);
-        if (! F.exists() )
+        File F = new File(FileName);
+        if (!F.exists())
         {
-            System.out.println("Fichier non trouvé"); 
-            return null;
+            System.out.println("File not found"); 
+            return new Board(0,0);
         }
         
         ArrayList< ArrayList<Integer>> board = new ArrayList< ArrayList<Integer>>();
@@ -42,6 +50,41 @@ public class Parser
                 board.add(currLine);
             }
         }        
+        return new Board(board);
+    }
+
+    // Prints an input board with JButtons to push to set living cells
+    static void ParseSelfInput (Automate gameEngine, JFrame mainFrame)
+    {
+        GridBagConstraints gc = new GridBagConstraints();
+        JDialog d = new JDialog(mainFrame, "Input");
+        d.setLayout(new GridBagLayout());
+        d.setModal(true);
+        ArrayList<ArrayList<JButton>> inputBoard = createInputBoard(gameEngine.gameBoard.rows, gameEngine.gameBoard.columns, d);
+        
+        JButton confirmButton = createConfirmButton(gameEngine, mainFrame, d, inputBoard);
+        displayAddedCell(gameEngine.gameBoard.rows, gameEngine.gameBoard.columns, d, confirmButton);
+        
+        d.pack();
+        Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+        d.setLocation(dim.width/2-d.getSize().width/2, dim.height/2-d.getSize().height/2);
+        d.setVisible(true);
+        return;
+    }
+
+    static ArrayList<ArrayList<JButton>> createInputBoard(int rows, int columns, JDialog frame)
+    {
+        ArrayList<ArrayList<JButton>> board = new ArrayList<ArrayList<JButton>>();
+        for(int i=0; i < rows; i++)
+        {
+            board.add(new ArrayList<JButton>());
+            for(int j=0; j< columns ; j++)
+            {
+                JButton setupCell = createSetupCell();
+                board.get(i).add(setupCell);
+                displayAddedCell(i, j, frame, setupCell);
+            }
+        }
         return board;
     }
 
@@ -60,7 +103,7 @@ public class Parser
         return setupCell;
     }
 
-    static void displayAddedCell(int row, int column, JFrame frame, JButton setupCell)
+    static void displayAddedCell(int row, int column, JDialog frame, JButton setupCell)
     {
         GridBagConstraints gc = new GridBagConstraints();
         gc.gridx = column;
@@ -72,52 +115,31 @@ public class Parser
     {
         return button.getBackground() == Color.BLUE;
     }
-    
-    static void ParseSelfInput (int row, int column, final Affichage2 A, final JFrame mainFrame, final Historique History, final JLabel Etape) 
+
+    // Creates the confirm button. Upon triggering it will update the gameBoard and repaint the mainframe to print the new board
+    static JButton createConfirmButton(Automate gameEngine, JFrame mainFrame, JDialog d, ArrayList<ArrayList<JButton>> inputBoard)
     {
-        GridBagConstraints gc = new GridBagConstraints();
-        final JFrame frame = new JFrame();
-        
-        frame.setLayout(new GridBagLayout());
-        final ArrayList< ArrayList <JButton>>  board= new ArrayList< ArrayList <JButton>> ();
-        
-        for(int i=0 ; i < row ; i++)
-        {
-            board.add( new ArrayList<JButton>() ) ;
-            for(int j=0 ; j< column ; j++)
-            {
-                final JButton setupCell = createSetupCell();
-                board.get(i).add(setupCell);
-                displayAddedCell(i, j, frame, setupCell);
-            }
-            
-        }
-        JButton Ltmp = new JButton( "OK");
-        Ltmp.addActionListener(new ActionListener(){
+        JButton confirmButton = new JButton("Confirm");
+        confirmButton.addActionListener(new ActionListener(){
             public void actionPerformed( ActionEvent ae )
             {
                 ArrayList< ArrayList<Integer>> resBoard = new ArrayList< ArrayList<Integer>>();
-                for(int i= 0; i<row; i++)
+                for(int i=0; i<inputBoard.size(); i++)
                 {
-                    resBoard.add( new ArrayList<Integer>());
-                    for(int j=0; j<column; j++)
+                    resBoard.add(new ArrayList<Integer>());
+                    for(int j=0; j<inputBoard.get(0).size(); j++)
                     {
-                        if(isCellSet(board.get(i).get(j)))
+                        if(isCellSet(inputBoard.get(i).get(j)))
                             resBoard.get(i).add(Integer.valueOf(1));
                         else
                             resBoard.get(i).add(Integer.valueOf(0));
                     }
                 }
-                frame.dispose();
-                A.ReglageAMain( resBoard,mainFrame, History,Etape);
+                d.dispose();
+                gameEngine.reset(new Board(resBoard));
+                mainFrame.repaint();
             }
         });
-        
-        displayAddedCell(row, column, frame, Ltmp);
-        
-        frame.pack();
-        Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-        frame.setLocation(dim.width/2-frame.getSize().width/2, dim.height/2-frame.getSize().height/2);
-        frame.setVisible(true);
+        return confirmButton;           
     }
 }

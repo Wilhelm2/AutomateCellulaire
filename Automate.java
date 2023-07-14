@@ -4,147 +4,89 @@ import java.util.Random ;
 import javax.swing.JPanel;
 import java.util.Collections;
 
+// Class representing the game engine. It is responsible for the game board and game history and handles the operations performed on them. 
 public class Automate
 {
-    ArrayList<ArrayList<Integer>> tab = new ArrayList <ArrayList<Integer>>();
-    int column,row;
-    int speed= 1;
-    public boolean run = false;
-    public boolean changing = true;
-    JPanel Actual ;
-    Affichage2 Aff;
-            
+    Board gameBoard; // Game board updated at each turn 
+    History gameHistory; // Game history to which the game board is added at each turn 
+
     public Automate(int row, int column)
     {
-        this.column = column;
-        this.row = row;
-        initializeEmptyBoard();
+        gameBoard = new Board(row, column);
+        gameHistory = new History(gameBoard);
     }
 
-    public Automate(ArrayList<ArrayList<Integer>> tab)
+    public Automate(ArrayList<ArrayList<Integer>> board)
     {
-        this.tab = tab;
-        this.row = tab.size();
-        this.column = tab.get(0).size();
-    }
-    
-    public void initializeEmptyBoard()
-    {
-        for(int i=0 ; i < row ; i++)
-        {
-            tab.add(new ArrayList<Integer>());
-            for(int j=0; j < column; j++)
-                tab.get(i).add(Integer.valueOf(0));
-        }
+        gameBoard = new Board(board);
+        gameHistory = new History(gameBoard);
     }
 
-    public void changeState()
+    // Updates the game board to the next turn and saves it to the game history
+    public void nextTurnUpdate()
     {
-        run = !run;
-    }
-    
-    public void miseAJour()
-    {
-        // commence par faire une copie du tableau
-        ArrayList< ArrayList<Integer> > Ltmp = new ArrayList< ArrayList <Integer>> ();
-        for(int i = 0 ; i< row;i++)
+        Board newBoard = new Board(gameBoard.rows, gameBoard.columns); // create new board for next turn
+        for(int i=0; i < gameBoard.rows; i++)
         {
-            Ltmp.add( new ArrayList<Integer>() ) ;
-            for(int j=0; j < column;j++)
-                Ltmp.get(i).add( Integer.valueOf(tab.get(i).get(j).intValue())) ; 
-        }
-        
-        for(int i = 0 ; i< row;i++)
-        {
-            for(int j=0; j < column;j++)
+            for(int j=0; j < gameBoard.columns; j++)
             {
-                if( JeuVieSimple(i,j,Ltmp) )
-                {
-                    if( Ltmp.get(i).get(j).intValue() == 0) // cellule morte -> changement
-                        tab.get(i).set(j, Integer.valueOf(1));
-                }
+                if(gameBoard.isLiving(i,j))
+                    newBoard.setEntry(i, j, 1);
                 else
-                {
-                    if( Ltmp.get(i).get(j).intValue() == 1) // cellule morte -> changement
-                        tab.get(i).set(j, Integer.valueOf(0));
-                }
+                    newBoard.setEntry(i, j, 0);
             }
         }
+        gameBoard = newBoard;
+        gameHistory.addEvent(gameBoard);
     }
     
-    public int VoisinsVivants( int row, int column, ArrayList<ArrayList<Integer>> Ltmp )
-    {
-        int i,j;
-        int Voisins = 0;
-        for(i = ((row==0) ? 0: -1) ; i <= ((row == this.row-1) ? 0:1) ; i++)
-        {
-            for(j = ((column==0) ? 0: -1) ; j <= ((column == this.column-1) ? 0:1);j++)            
-            {
-                if ( i==0 && j== 0 ) // centre du "carré"
-                    continue ;
-                if( Ltmp.get(row+i).get(column+j).intValue() == 1)
-                    Voisins ++;
-            }
-        }
-        return Voisins;
-    }
-    // Si 3 voisins vivants ->naît 
-    // Si vivante et entourée de 2 ou 3 cellules reste vivante
-    // Sinon meurt
-    public boolean JeuVieSimple( int row, int column, ArrayList<ArrayList<Integer>> Ltmp)
-    {
-        int Voisins = VoisinsVivants(row,column, Ltmp);
-        boolean Vivant = (Ltmp.get(row).get(column).intValue() == 1);
-        
-        
-        if( Voisins == 3 && !Vivant )
-            return true;
-        else if( Vivant && ( Voisins == 2 || Voisins == 3) )
-            return true;
-        else
-            return false;
-    }
-    
-    public void setTab(int row, int column, ArrayList<ArrayList<Integer>> tab )
-    {
-        this.row = row;
-        this.column = column;
-        this.tab = tab;
-    }
-    
-    public void setTab(ArrayList<ArrayList<Integer>> tab )
-    {
-        this.row = tab.size();
-        this.column = tab.get(0).size();
-        this.tab = tab;
-    }
-    
-    
+    // Initializes the game board to a chessboard
     public void ChessBoard()
     {
-        for(int i=0;i<row; i++)
+        if(gameBoard.isEmpty()) // does nothing if there is no game baord (ie rows=columns=0)
+            return;
+
+        reset();
+        for(int i=0; i < gameBoard.rows; i++)
         {
-            for(int j=0;j<column;j++)
+            for(int j=0; j < gameBoard.columns; j++)
             {
                 if( (i+j)%2 == 0)
-                    tab.get(i).set(j,Integer.valueOf(1));
+                    gameBoard.setEntry(i, j, 1);
                 else
-                    tab.get(i).set(j,Integer.valueOf(0));
+                    gameBoard.setEntry(i, j, 0);
             }
         }
     }
     
+    // Initializes the game board to a board with nbInitialLivingCells living cells
     public void RandomSetting(int nbInitialLivingCells)
     {
         int randRow, randColumn;
         Random generator = new Random(System.currentTimeMillis());
-        initializeEmptyBoard();
-        
+        if(gameBoard.isEmpty())
+            return;
+
+        reset();
         for (int i = 0 ; i < nbInitialLivingCells ; i++)
         {
-            randRow = (int)( generator.nextDouble()*(row) ) ;
-            randColumn = (int)( generator.nextDouble()*(column) ) ;
-            tab.get(randRow).set(randColumn, Integer.valueOf(1));
+            randRow = (int)(generator.nextDouble()*(gameBoard.rows));
+            randColumn = (int)(generator.nextDouble()*(gameBoard.columns));
+            gameBoard.setEntry(randRow, randColumn, Integer.valueOf(1));
         }
+    }
+
+    // Resets the game board to an empty board. It also resets the game history
+    public void reset()
+    {
+        gameBoard.initializeEmptyBoard();
+        gameHistory = new History(gameBoard);
+    }
+
+    // Resets the game board to the game board given as parameter. It also resets the game history
+    public void reset(Board board)
+    {
+        gameBoard = board;
+        gameHistory = new History(gameBoard);
     }    
 }
