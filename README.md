@@ -19,8 +19,11 @@ At each turn, the new state of each cell is computed following the rule:
 * Otherwise the cell is set into the dead state.  
 
 ## Board choices 
-
-
+The initial automaton state can be configured through the choice box which offers the following options to initialize the board: 
+* **Random:** Sets ~100 randomly selected cells to the living state. 
+* **Chessboard:** Initializes the board as a chessboard, ie a chaining of one living cell followed by a dead one.
+* **Import file:** Imports a board from a file. The format of the file is: *O* represents a living cell and *X* a dead cell. Characters are separated by spaces and each line represents a row. See the *inputExample.txt* for an example of input file.
+* **Self input:** Opens a panel of *JButtons* which allows the user to select the living cells on the board.   
 
 ## Options 
 
