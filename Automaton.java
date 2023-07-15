@@ -3,16 +3,16 @@ import java.util.ArrayList;
 import java.util.Random;
 
 // Class representing the game engine. It is responsible for the game board and game history and handles the operations performed on them. 
-public class Automate {
+public class Automaton {
     Board gameBoard; // Game board updated at each turn
     History gameHistory; // Game history to which the game board is added at each turn
 
-    public Automate(int row, int column) {
+    public Automaton(int row, int column) {
         gameBoard = new Board(row, column);
         gameHistory = new History(gameBoard);
     }
 
-    public Automate(ArrayList<ArrayList<Integer>> board) {
+    public Automaton(ArrayList<ArrayList<Integer>> board) {
         gameBoard = new Board(board);
         gameHistory = new History(gameBoard);
     }

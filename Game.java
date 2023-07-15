@@ -3,7 +3,7 @@ import java.io.IOException;
 
 // Class containing the function that runs the game. 
 public class Game {
-    static Automate gameEngine;
+    static Automaton gameEngine;
     static Display gameScreen;
 
     public static void main(String[] args)
@@ -15,7 +15,7 @@ public class Game {
 
         new File(gameScreen.DirectoryPATH).mkdir(); // creates the directory which contains saved game images
 
-        gameEngine = new Automate(Integer.parseInt(args[0]), Integer.parseInt(args[1]));
+        gameEngine = new Automaton(Integer.parseInt(args[0]), Integer.parseInt(args[1]));
         gameScreen = new Display(gameEngine);
 
         game();

@@ -7,9 +7,9 @@ import javax.swing.JPanel;
 
 // Class that draws the gameboard
 public class DrawBoard extends JPanel {
-    Automate gameEngine;
+    Automaton gameEngine;
 
-    public DrawBoard(Automate gameEngine) {
+    public DrawBoard(Automaton gameEngine) {
         this.gameEngine = gameEngine;
     }
 

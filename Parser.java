@@ -48,7 +48,7 @@ public class Parser {
     }
 
     // Prints an input board with JButtons to push to set living cells
-    static void ParseSelfInput(Automate gameEngine, JFrame mainFrame) {
+    static void ParseSelfInput(Automaton gameEngine, JFrame mainFrame) {
         GridBagConstraints gc = new GridBagConstraints();
         JDialog d = new JDialog(mainFrame, "Input");
         d.setLayout(new GridBagLayout());
@@ -105,7 +105,7 @@ public class Parser {
 
     // Creates the confirm button. Upon triggering it will update the gameBoard and
     // repaint the mainframe to print the new board
-    static JButton createConfirmButton(Automate gameEngine, JFrame mainFrame, JDialog d,
+    static JButton createConfirmButton(Automaton gameEngine, JFrame mainFrame, JDialog d,
             ArrayList<ArrayList<JButton>> inputBoard) {
         JButton confirmButton = new JButton("Confirm");
         confirmButton.addActionListener(new ActionListener() {
