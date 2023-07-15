@@ -23,7 +23,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
 
-public class Affichage2 extends JPanel {
+public class Display extends JPanel {
     static String DirectoryPATH = "./Image"; // Path to the directory to which will store saved images
     JToolBar toolbar = new JToolBar(); // contains the screen elements except the board
     JLabel stepCounter; // Counts the number of steps since the initial position
@@ -35,7 +35,7 @@ public class Affichage2 extends JPanel {
 
     final JFrame frame = new JFrame();
 
-    Affichage2(Automate gameEngine)
+    Display(Automate gameEngine)
             throws IOException, InterruptedException {
         setInitialFrame(gameEngine);
     }

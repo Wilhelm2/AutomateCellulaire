@@ -4,7 +4,7 @@ import java.io.IOException;
 // Class containing the function that runs the game. 
 public class Game {
     static Automate gameEngine;
-    static Affichage2 gameScreen;
+    static Display gameScreen;
 
     public static void main(String[] args)
             throws IOException, InterruptedException {
@@ -16,7 +16,7 @@ public class Game {
         new File(gameScreen.DirectoryPATH).mkdir(); // creates the directory which contains saved game images
 
         gameEngine = new Automate(Integer.parseInt(args[0]), Integer.parseInt(args[1]));
-        gameScreen = new Affichage2(gameEngine);
+        gameScreen = new Display(gameEngine);
 
         game();
     }
