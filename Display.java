@@ -35,13 +35,13 @@ public class Display extends JPanel {
 
     final JFrame frame = new JFrame();
 
-    Display(Automate gameEngine)
+    Display(Automaton gameEngine)
             throws IOException, InterruptedException {
         setInitialFrame(gameEngine);
     }
 
     // Sets the initial screen with an empty board
-    public void setInitialFrame(Automate gameEngine)
+    public void setInitialFrame(Automaton gameEngine)
             throws IOException, InterruptedException {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -81,7 +81,7 @@ public class Display extends JPanel {
         return label;
     }
 
-    public JButton createStepBackButton(Automate gameEngine) {
+    public JButton createStepBackButton(Automaton gameEngine) {
         JButton button = new JButton(new ImageIcon("ScreenPictures/previous.png"));
         button.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
@@ -101,7 +101,7 @@ public class Display extends JPanel {
         return button;
     }
 
-    public JButton createStopButton(Automate gameEngine) {
+    public JButton createStopButton(Automaton gameEngine) {
         JButton button = new JButton(new ImageIcon("ScreenPictures/stop.png"));
         button.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
@@ -113,7 +113,7 @@ public class Display extends JPanel {
         return button;
     }
 
-    public JButton createStepForwardButton(Automate gameEngine) {
+    public JButton createStepForwardButton(Automaton gameEngine) {
         JButton button = new JButton(new ImageIcon("ScreenPictures/forward.png"));
         button.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
@@ -160,21 +160,21 @@ public class Display extends JPanel {
         return button;
     }
 
-    public JButton createSaveButton(Automate gameEngine) {
+    public JButton createSaveButton(Automaton gameEngine) {
         JButton button = new JButton("Save Image");
         button.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
-                saveAutomateStateToImage(gameEngine, "/Automate:" + gameEngine.gameBoard.rows + ":"
+                saveAutomatonStateToImage(gameEngine, "/Automaton:" + gameEngine.gameBoard.rows + ":"
                         + gameEngine.gameBoard.columns + " E: " + gameEngine.gameHistory.currIndex + ".png");
-                saveAutomateStateToImage(new Automate(gameEngine.gameHistory.gameHistory.get(0).board),
-                        "/INIT:Automate:" + gameEngine.gameBoard.rows + ":" + gameEngine.gameBoard.columns + " E: "
+                saveAutomatonStateToImage(new Automaton(gameEngine.gameHistory.gameHistory.get(0).board),
+                        "/INIT:Automaton:" + gameEngine.gameBoard.rows + ":" + gameEngine.gameBoard.columns + " E: "
                                 + gameEngine.gameHistory.currIndex + ".png");
             }
         });
         return button;
     }
 
-    public void saveAutomateStateToImage(Automate gameEngine, String filePath) {
+    public void saveAutomatonStateToImage(Automaton gameEngine, String filePath) {
         DrawBoard dbSave = new DrawBoard(gameEngine);
         dbSave.setSize(new Dimension(gameEngine.gameBoard.columns * 20, gameEngine.gameBoard.rows * 20)); // needs to be
                                                                                                           // called
@@ -204,7 +204,7 @@ public class Display extends JPanel {
         }
     }
 
-    public JButton createResetButton(Automate gameEngine) {
+    public JButton createResetButton(Automaton gameEngine) {
         JButton button = new JButton("Reset");
         button.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
@@ -216,7 +216,7 @@ public class Display extends JPanel {
         return button;
     }
 
-    public JComboBox<String> createStartConditionChoiceBox(Automate gameEngine) {
+    public JComboBox<String> createStartConditionChoiceBox(Automaton gameEngine) {
         String[] StartConditions = { "Choice", "Random", "Chessboard", "Import File", "Self input" };
         final JComboBox<String> comboxStartConditions = new JComboBox<>(StartConditions);
         comboxStartConditions.addActionListener(new ActionListener() {
@@ -251,7 +251,7 @@ public class Display extends JPanel {
         return comboxStartConditions;
     }
 
-    public JButton createResizeBoardConfirmButton(Automate gameEngine, JTextField inputRows, JTextField inputColumns,
+    public JButton createResizeBoardConfirmButton(Automaton gameEngine, JTextField inputRows, JTextField inputColumns,
             JFrame mainFrame, JDialog resizeBox) {
         JButton button = new JButton("Confirm");
         button.addActionListener(new ActionListener() {
@@ -267,7 +267,7 @@ public class Display extends JPanel {
         return button;
     }
 
-    JButton createResizeBoardButton(JFrame mainFrame, Automate gameEngine) {
+    JButton createResizeBoardButton(JFrame mainFrame, Automaton gameEngine) {
         JButton button = new JButton("Resize Board");
         button.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
