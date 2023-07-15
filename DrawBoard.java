@@ -1,27 +1,25 @@
-import javax.swing.JPanel;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Color;
+
+import javax.swing.JPanel;
 
 // Class that draws the gameboard
 public class DrawBoard extends JPanel {
     Automate gameEngine;
 
-    public DrawBoard(Automate gameEngine)
-    {
+    public DrawBoard(Automate gameEngine) {
         this.gameEngine = gameEngine;
     }
 
     @Override
-    public Dimension getPreferredSize() 
-    {
-        return new Dimension(gameEngine.gameBoard.columns*20, gameEngine.gameBoard.rows*20);
+    public Dimension getPreferredSize() {
+        return new Dimension(gameEngine.gameBoard.columns * 20, gameEngine.gameBoard.rows * 20);
     }
 
     @Override
-    protected void paintComponent(Graphics g) 
-    {
+    protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g.create();
         g2d.setPaint(Color.WHITE);
@@ -40,7 +38,8 @@ public class DrawBoard extends JPanel {
                 else
                     g.setColor(Color.WHITE);
                 g.fillOval(j * 20, i * 20, 20, 20);
-//                System.out.println(i+","+j+ " living " + gameEngine.gameBoard.board.get(i).get(j).intValue() );
+                // System.out.println(i+","+j+ " living " +
+                // gameEngine.gameBoard.board.get(i).get(j).intValue() );
             }
         }
         g2d.dispose();

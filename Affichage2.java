@@ -1,70 +1,66 @@
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.JLabel;
-import javax.swing.ImageIcon;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.awt.Dimension;
-import java.awt.Toolkit;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import javax.swing.JToolBar;
-import javax.swing.JButton;
 import java.awt.BorderLayout;
-import java.lang.Thread;
-import java.awt.event.*;
-import javax.swing.JFormattedTextField;
+import java.awt.Dimension;
 import java.awt.Font;
-import javax.imageio.ImageIO;
-import java.io.File;
+import java.awt.Graphics;
+import java.awt.GridBagLayout;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
-import java.awt.Component;
+import java.io.File;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JFormattedTextField;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import java.awt.GridBagLayout;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.JToolBar;
 
 public class Affichage2 extends JPanel {
+    static String DirectoryPATH = "./Image"; // Path to the directory to which will store saved images
     JToolBar toolbar = new JToolBar(); // contains the screen elements except the board
     JLabel stepCounter; // Counts the number of steps since the initial position
-    DrawBoard db; // Class that draws the game board in order to print it on the screen 
+    DrawBoard db; // Class that draws the game board in order to print it on the screen
     JFormattedTextField speedField; // Field that contains the game speed
-    int speed = 1; // Initial speed is 1 update every second. speed = 10 means 10 updates per second
-    boolean isRunning = false; // true: the board is evolving every turn, false: the board does not evolve 
-    static String DirectoryPATH = "./Image"; // Path to the directory to which will store saved images
+                   int speed = 1; // Initial speed is 1 update every second. speed = 10 means 10 updates per
+    // second
+    boolean isRunning = false; // true: the board is evolving every turn, false: the board does not evolve
 
     final JFrame frame = new JFrame();
 
-    Affichage2 (Automate gameEngine)
-        throws IOException, InterruptedException 
-    {
+    Affichage2(Automate gameEngine)
+            throws IOException, InterruptedException {
         setInitialFrame(gameEngine);
     }
 
     // Sets the initial screen with an empty board
     public void setInitialFrame(Automate gameEngine)
-        throws IOException, InterruptedException 
-    {
+            throws IOException, InterruptedException {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         toolbar.add(createSimpleJlabel(" Step: "));
-        stepCounter = createSimpleJlabel(" "+ String.valueOf(gameEngine.gameHistory.currIndex)+ "  ");
+        stepCounter = createSimpleJlabel(" " + String.valueOf(gameEngine.gameHistory.currIndex) + "  ");
         toolbar.add(stepCounter);
 
         toolbar.add(createStepBackButton(gameEngine));
         toolbar.add(createStopButton(gameEngine));
         toolbar.add(createStepForwardButton(gameEngine));
-        
+
         toolbar.add(createSimpleJlabel(" Speed: "));
         speedField = createTextField();
-        toolbar.add(speedField);        
+        toolbar.add(speedField);
         toolbar.add(createSpeedTextFieldConfirmButton(speedField));
-        
+
         toolbar.add(createSaveButton(gameEngine));
         toolbar.add(createResetButton(gameEngine));
-        
+
         toolbar.add(createStartConditionChoiceBox(gameEngine));
         toolbar.add(createResizeBoardButton(frame, gameEngine));
 
@@ -79,28 +75,21 @@ public class Affichage2 extends JPanel {
         frame.setVisible(true);
     }
 
-    public JLabel createSimpleJlabel(String labelName) 
-    {
+    public JLabel createSimpleJlabel(String labelName) {
         JLabel label = new JLabel(labelName);
         label.setFont(new Font("Courier", Font.BOLD, 15));
         return label;
     }
 
-    public JButton createStepBackButton(Automate gameEngine)
-    {
+    public JButton createStepBackButton(Automate gameEngine) {
         JButton button = new JButton(new ImageIcon("arriere.png"));
-        button.addActionListener(new ActionListener(){
-            public void actionPerformed(ActionEvent ae)
-            {
-                synchronized(this)
-                {
-                    if(gameEngine.gameHistory.isInInitialState())
-                    {
+        button.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent ae) {
+                synchronized (this) {
+                    if (gameEngine.gameHistory.isInInitialState()) {
                         System.out.println("Already in initial state");
                         return;
-                    }
-                    else
-                    {
+                    } else {
                         System.out.println("Goes back!");
                         gameEngine.gameBoard = gameEngine.gameHistory.goOneBackward();
                         updateStepCounter(gameEngine.gameHistory.currIndex);
@@ -112,34 +101,27 @@ public class Affichage2 extends JPanel {
         return button;
     }
 
-    public JButton createStopButton(Automate gameEngine)
-    {
+    public JButton createStopButton(Automate gameEngine) {
         JButton button = new JButton(new ImageIcon("stop.png"));
-        button.addActionListener(new ActionListener(){
-            public void actionPerformed( ActionEvent ae )
-            {
-                if(!(gameEngine.gameHistory.detectCycle() || gameEngine.gameHistory.detectEnd() || gameEngine.gameBoard.isAllDead()))
+        button.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent ae) {
+                if (!(gameEngine.gameHistory.detectCycle() || gameEngine.gameHistory.detectEnd()
+                        || gameEngine.gameBoard.isAllDead()))
                     isRunning = !isRunning;
             }
         });
         return button;
     }
 
-    public JButton createStepForwardButton(Automate gameEngine)
-    {
+    public JButton createStepForwardButton(Automate gameEngine) {
         JButton button = new JButton(new ImageIcon("avant.png"));
-        button.addActionListener(new ActionListener(){
-            public void actionPerformed(ActionEvent ae)
-            {
-                synchronized(this)
-                {
-                    if(gameEngine.gameHistory.isMaxState())
-                    {
+        button.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent ae) {
+                synchronized (this) {
+                    if (gameEngine.gameHistory.isMaxState()) {
                         System.out.println("Is at max state");
-                        return ;
-                    }
-                    else
-                    {
+                        return;
+                    } else {
                         System.out.println("Goes one forward");
                         gameEngine.gameBoard = gameEngine.gameHistory.goOneForward();
                         updateStepCounter(gameEngine.gameHistory.currIndex);
@@ -151,82 +133,94 @@ public class Affichage2 extends JPanel {
         return button;
     }
 
-    public void updateStepCounter(int step)
-    {
+    public void updateStepCounter(int step) {
         stepCounter.setText(" " + step + "  ");
     }
 
-    public JFormattedTextField createTextField()
-    {
+    public JFormattedTextField createTextField() {
         JFormattedTextField textField = new JFormattedTextField();
         textField.setPreferredSize(new Dimension(40, 30));
         textField.setMaximumSize(new Dimension(30, 30));
         return textField;
     }
 
-    public JButton createSpeedTextFieldConfirmButton(JFormattedTextField field)
-    {
+    public JButton createSpeedTextFieldConfirmButton(JFormattedTextField field) {
         JButton button = new JButton("OK");
-        button.addActionListener(new ActionListener(){
-            public void actionPerformed( ActionEvent ae )
-            {
+        button.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent ae) {
                 try {
-                    speed = Integer.parseInt(field.getText()); //,10);
-                } catch ( NumberFormatException e) {System.out.println("Bad format"); return;};
+                    speed = Integer.parseInt(field.getText()); // ,10);
+                } catch (NumberFormatException e) {
+                    System.out.println("Bad format");
+                    return;
+                }
+                ;
             }
         });
         return button;
     }
 
-    public JButton createSaveButton(Automate gameEngine)
-    {
+    public JButton createSaveButton(Automate gameEngine) {
         JButton button = new JButton("Save Image");
-        button.addActionListener(new ActionListener(){
-            public void actionPerformed(ActionEvent ae)
-            {
-                saveAutomateStateToImage(gameEngine, "/Automate:"+ gameEngine.gameBoard.rows + ":" + gameEngine.gameBoard.columns + " E: " + gameEngine.gameHistory.currIndex +".png");
-                saveAutomateStateToImage(new Automate(gameEngine.gameHistory.gameHistory.get(0).board), "/INIT:Automate:" + gameEngine.gameBoard.rows + ":" + gameEngine.gameBoard.columns + " E: " + gameEngine.gameHistory.currIndex + ".png");           
+        button.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent ae) {
+                saveAutomateStateToImage(gameEngine, "/Automate:" + gameEngine.gameBoard.rows + ":"
+                        + gameEngine.gameBoard.columns + " E: " + gameEngine.gameHistory.currIndex + ".png");
+                saveAutomateStateToImage(new Automate(gameEngine.gameHistory.gameHistory.get(0).board),
+                        "/INIT:Automate:" + gameEngine.gameBoard.rows + ":" + gameEngine.gameBoard.columns + " E: "
+                                + gameEngine.gameHistory.currIndex + ".png");
             }
         });
         return button;
     }
 
-    public void saveAutomateStateToImage(Automate gameEngine, String filePath)
-    {
+    public void saveAutomateStateToImage(Automate gameEngine, String filePath) {
         DrawBoard dbSave = new DrawBoard(gameEngine);
-        dbSave.setSize(new Dimension(gameEngine.gameBoard.columns*20, gameEngine.gameBoard.rows*20)); // needs to be called otherwise size = 0 and repaint() is not called (for optimization since there would be nothing to print)
+        dbSave.setSize(new Dimension(gameEngine.gameBoard.columns * 20, gameEngine.gameBoard.rows * 20)); // needs to be
+                                                                                                          // called
+                                                                                                          // otherwise
+                                                                                                          // size = 0
+                                                                                                          // and
+                                                                                                          // repaint()
+                                                                                                          // is not
+                                                                                                          // called (for
+                                                                                                          // optimization
+                                                                                                          // since there
+                                                                                                          // would be
+                                                                                                          // nothing to
+                                                                                                          // print)
         dbSave.revalidate();
         dbSave.repaint();
         dbSave.setVisible(true);
 
-        BufferedImage imageToSave = new BufferedImage(db.getSize().width, db.getSize().height, BufferedImage.TYPE_INT_ARGB); 
+        BufferedImage imageToSave = new BufferedImage(db.getSize().width, db.getSize().height,
+                BufferedImage.TYPE_INT_ARGB);
         Graphics graph = imageToSave.createGraphics();
-        dbSave.printAll(graph); 
+        dbSave.printAll(graph);
         graph.dispose();
-        try{ImageIO.write(imageToSave,"png",new File(DirectoryPATH+filePath));}catch (Exception e) {}
+        try {
+            ImageIO.write(imageToSave, "png", new File(DirectoryPATH + filePath));
+        } catch (Exception e) {
+        }
     }
 
-    public JButton createResetButton(Automate gameEngine)
-    {
+    public JButton createResetButton(Automate gameEngine) {
         JButton button = new JButton("Reset");
-        button.addActionListener(new ActionListener(){
-            public void actionPerformed( ActionEvent ae )
-            {
+        button.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent ae) {
                 gameEngine.reset();
-                updateStepCounter(0);          
+                updateStepCounter(0);
                 frame.repaint();
             }
         });
         return button;
     }
 
-    public JComboBox<String>  createStartConditionChoiceBox(Automate gameEngine)
-    {
-        String  []StartConditions = {"Choice", "Random", "Chessboard", "Import File", "Self input"};
+    public JComboBox<String> createStartConditionChoiceBox(Automate gameEngine) {
+        String[] StartConditions = { "Choice", "Random", "Chessboard", "Import File", "Self input" };
         final JComboBox<String> comboxStartConditions = new JComboBox<>(StartConditions);
-        comboxStartConditions.addActionListener(new ActionListener(){
-            public void actionPerformed( ActionEvent ae )
-            {
+        comboxStartConditions.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent ae) {
                 String select = comboxStartConditions.getSelectedItem().toString();
                 if (select.equals("Choice"))
                     ; // does nothing
@@ -234,21 +228,21 @@ public class Affichage2 extends JPanel {
                     gameEngine.RandomSetting(100);
                 else if (select.equals("Chessboard"))
                     gameEngine.ChessBoard();
-                else if (select.equals("Import File"))
-                {
+                else if (select.equals("Import File")) {
                     String fileName = JOptionPane.showInputDialog(frame, "Filename", null);
-                    try{
+                    try {
                         gameEngine.reset(Parser.ParseFile(fileName));
+                    } catch (IOException e) {
+                        System.out.println("File not found");
+                        return;
                     }
-                        catch (IOException e) { System.out.println("File not found"); return;};
-                }
-                else if(select.equals("Self input")) 
-                {
+                    ;
+                } else if (select.equals("Self input")) {
                     Parser.ParseSelfInput(gameEngine, frame);
-//                    db.gameEngine = gameEngine;
+                    // db.gameEngine = gameEngine;
                 }
 
-                if(!select.equals("Choice")) // selected a new game configuration
+                if (!select.equals("Choice")) // selected a new game configuration
                 {
                     updateStepCounter(0);
                 }
@@ -258,12 +252,26 @@ public class Affichage2 extends JPanel {
         return comboxStartConditions;
     }
 
-    JButton createResizeBoardButton(JFrame mainFrame, Automate gameEngine)
-    {
+    public JButton createResizeBoardConfirmButton(Automate gameEngine, JTextField inputRows, JTextField inputColumns,
+            JFrame mainFrame, JDialog resizeBox) {
+        JButton button = new JButton("Confirm");
+        button.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent ae) {
+                gameEngine.reset(
+                        new Board(Integer.parseInt(inputRows.getText()), Integer.parseInt(inputColumns.getText())));
+                resizeBox.dispose();
+                updateStepCounter(gameEngine.gameHistory.currIndex);
+                mainFrame.pack();
+                mainFrame.repaint();
+            }
+        });
+        return button;
+    }
+
+    JButton createResizeBoardButton(JFrame mainFrame, Automate gameEngine) {
         JButton button = new JButton("Resize Board");
-        button.addActionListener(new ActionListener(){
-            public void actionPerformed(ActionEvent ae)
-            {
+        button.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent ae) {
                 JDialog resizeBox = new JDialog(mainFrame, "Input");
                 resizeBox.setLayout(new GridBagLayout());
                 resizeBox.setModal(true);
@@ -273,27 +281,13 @@ public class Affichage2 extends JPanel {
                 resizeBox.add(createSimpleJlabel("columns:"));
                 JTextField inputColumns = createTextField();
                 resizeBox.add(inputColumns);
-                resizeBox.add(createResizeBoardConfirmButton(gameEngine, inputRows, inputColumns, mainFrame, resizeBox));
+                resizeBox
+                        .add(createResizeBoardConfirmButton(gameEngine, inputRows, inputColumns, mainFrame, resizeBox));
                 resizeBox.pack();
                 Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-                resizeBox.setLocation(dim.width/2-resizeBox.getSize().width/2, dim.height/2-resizeBox.getSize().height/2);
+                resizeBox.setLocation(dim.width / 2 - resizeBox.getSize().width / 2,
+                        dim.height / 2 - resizeBox.getSize().height / 2);
                 resizeBox.setVisible(true);
-            }
-        });
-        return button;
-    }
-
-    public JButton createResizeBoardConfirmButton(Automate gameEngine, JTextField inputRows, JTextField inputColumns, JFrame mainFrame, JDialog resizeBox)
-    {
-        JButton button = new JButton("Confirm");
-        button.addActionListener(new ActionListener(){
-            public void actionPerformed(ActionEvent ae)
-            {
-                gameEngine.reset(new Board(Integer.parseInt(inputRows.getText()), Integer.parseInt(inputColumns.getText())));                
-                resizeBox.dispose();
-                updateStepCounter(gameEngine.gameHistory.currIndex);
-                mainFrame.pack();
-                mainFrame.repaint();
             }
         });
         return button;
