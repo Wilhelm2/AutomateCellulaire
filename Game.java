@@ -42,8 +42,6 @@ public class Game {
                 gameScreen.db.repaint();
                 gameScreen.frame.repaint();
 
-                System.out.println("size of history " + gameEngine.gameHistory.gameHistory.size() + " current index "
-                        + gameEngine.gameHistory.currIndex);
                 if (gameEngine.gameHistory.detectEnd()) {
                     System.out.println("FIN");
                     gameScreen.isRunning = false;

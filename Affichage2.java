@@ -82,7 +82,7 @@ public class Affichage2 extends JPanel {
     }
 
     public JButton createStepBackButton(Automate gameEngine) {
-        JButton button = new JButton(new ImageIcon("arriere.png"));
+        JButton button = new JButton(new ImageIcon("ScreenPictures/previous.png"));
         button.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
                 synchronized (this) {
@@ -102,7 +102,7 @@ public class Affichage2 extends JPanel {
     }
 
     public JButton createStopButton(Automate gameEngine) {
-        JButton button = new JButton(new ImageIcon("stop.png"));
+        JButton button = new JButton(new ImageIcon("ScreenPictures/stop.png"));
         button.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
                 if (!(gameEngine.gameHistory.detectCycle() || gameEngine.gameHistory.detectEnd()
@@ -114,7 +114,7 @@ public class Affichage2 extends JPanel {
     }
 
     public JButton createStepForwardButton(Automate gameEngine) {
-        JButton button = new JButton(new ImageIcon("avant.png"));
+        JButton button = new JButton(new ImageIcon("ScreenPictures/forward.png"));
         button.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
                 synchronized (this) {
@@ -149,7 +149,7 @@ public class Affichage2 extends JPanel {
         button.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
                 try {
-                    speed = Integer.parseInt(field.getText()); // ,10);
+                    speed = Integer.parseInt(field.getText()); 
                 } catch (NumberFormatException e) {
                     System.out.println("Bad format");
                     return;
@@ -239,7 +239,6 @@ public class Affichage2 extends JPanel {
                     ;
                 } else if (select.equals("Self input")) {
                     Parser.ParseSelfInput(gameEngine, frame);
-                    // db.gameEngine = gameEngine;
                 }
 
                 if (!select.equals("Choice")) // selected a new game configuration

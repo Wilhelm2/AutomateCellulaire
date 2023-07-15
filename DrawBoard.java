@@ -25,7 +25,6 @@ public class DrawBoard extends JPanel {
         g2d.setPaint(Color.WHITE);
 
         int i, j;
-        System.out.println(gameEngine.gameBoard);
         for (i = 1; i < gameEngine.gameBoard.rows; i++)
             g2d.drawLine(0, 20 * i, gameEngine.gameBoard.columns * 20, 20 * i);
         for (i = 1; i < gameEngine.gameBoard.columns; i++)
@@ -38,11 +37,8 @@ public class DrawBoard extends JPanel {
                 else
                     g.setColor(Color.WHITE);
                 g.fillOval(j * 20, i * 20, 20, 20);
-                // System.out.println(i+","+j+ " living " +
-                // gameEngine.gameBoard.board.get(i).get(j).intValue() );
             }
         }
         g2d.dispose();
-        System.out.println("paintComponent of drawboard called!");
     }
 }
