@@ -41,5 +41,5 @@ To build the project go into the project's folder, open a terminal, and execute 
 > javac *.java 
 
 To run the game go into the project's folder, open a terminal, and execute the following command:
-> java Game <rows> <columns> 
+> java Game \<rows\> \<columns\> 
 
