@@ -35,4 +35,11 @@ The game screen offers several options:
 * **Resize board:** Displays a dialog to input the new board dimensions, then initializes an empty board to the given dimensions.
 
 ## How to run
+The project was built and run with the java version "11.0.19" 2023-04-18.
+
+To build the project go into the project's folder, open a terminal, and execute the following command:
+> javac *.java 
+
+To run the game go into the project's folder, open a terminal, and execute the following command:
+> java Game <rows> <columns> 
 
