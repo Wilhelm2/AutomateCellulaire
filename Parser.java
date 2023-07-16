@@ -86,7 +86,10 @@ public class Parser {
         setupCell.setPreferredSize(new Dimension(20, 20));
         setupCell.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
-                setupCell.setBackground(Color.BLUE);
+                if(setupCell.getBackground() == Color.BLUE)
+                    setupCell.setBackground(Color.WHITE);
+                else
+                    setupCell.setBackground(Color.BLUE);
             }
         });
         return setupCell;

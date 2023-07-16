@@ -21,17 +21,14 @@ public class DrawBoard extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        Graphics2D g2d = (Graphics2D) g.create();
-        g2d.setPaint(Color.WHITE);
 
-        int i, j;
-        for (i = 1; i < gameEngine.gameBoard.rows; i++)
-            g2d.drawLine(0, 20 * i, gameEngine.gameBoard.columns * 20, 20 * i);
-        for (i = 1; i < gameEngine.gameBoard.columns; i++)
-            g2d.drawLine(20 * i, 0, 20 * i, gameEngine.gameBoard.rows * 20);
+        for (int i = 1; i < gameEngine.gameBoard.rows; i++)
+            g.drawLine(0, 20 * i, gameEngine.gameBoard.columns * 20, 20 * i);
+        for (int i = 1; i < gameEngine.gameBoard.columns; i++)
+            g.drawLine(20 * i, 0, 20 * i, gameEngine.gameBoard.rows * 20);
 
-        for (i = 0; i < gameEngine.gameBoard.rows; i++) {
-            for (j = 0; j < gameEngine.gameBoard.columns; j++) {
+        for (int i = 0; i < gameEngine.gameBoard.rows; i++) {
+            for (int j = 0; j < gameEngine.gameBoard.columns; j++) {
                 if (gameEngine.gameBoard.board.get(i).get(j).intValue() == 1)
                     g.setColor(Color.BLUE);
                 else
@@ -39,6 +36,5 @@ public class DrawBoard extends JPanel {
                 g.fillOval(j * 20, i * 20, 20, 20);
             }
         }
-        g2d.dispose();
     }
 }
